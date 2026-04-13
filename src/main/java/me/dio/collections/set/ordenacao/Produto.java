@@ -5,19 +5,25 @@ import java.util.Objects;
 
 /**
  * Record Produto: Inmutabilidad nativa.
- * Implementa Comparable para ordenação natural por nome (ignora case).
+ * Refactor de Portabilidad: Desempate en compareTo para evitar pérdida de elementos en TreeSet.
  */
 public record Produto(long codigo, String nome, double preco, int quantidade) 
         implements Comparable<Produto> {
 
+    /**
+     * Contrato Comparable Robusto:
+     * Si los nombres son iguales, utiliza el código como desempate (Unique Identifier).
+     * Esto evita que un TreeSet considere dos productos diferentes como "iguales" solo por el nombre.
+     */
     @Override
     public int compareTo(Produto p) {
-        return nome.compareToIgnoreCase(p.nome());
+        int result = this.nome.compareToIgnoreCase(p.nome());
+        if (result == 0) {
+            return Long.compare(this.codigo, p.codigo());
+        }
+        return result;
     }
 
-    /**
-     * Identidad del Set basada únicamente en el código del producto.
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -30,20 +36,13 @@ public record Produto(long codigo, String nome, double preco, int quantidade)
         return Objects.hash(codigo);
     }
 
-    /**
-     * Comparadores fluidos (Java 25 Ready).
-     */
     public static Comparator<Produto> porPreco() {
-        return Comparator.comparingDouble(Produto::preco);
+        return Comparator.comparingDouble(Produto::preco)
+                .thenComparingLong(Produto::codigo); // Desempate por código en el comparador también
     }
 
     @Override
     public String toString() {
-        return "Produto{" +
-                "codigo=" + codigo +
-                ", nome='" + nome + '\'' +
-                ", preco=" + preco +
-                ", quantidade=" + quantidade +
-                '}';
+        return String.format("Produto[id=%d, nome=%s, preco=%.2f]", codigo, nome, preco);
     }
 }

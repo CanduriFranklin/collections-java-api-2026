@@ -24,7 +24,7 @@ class OrdenacaoPessoasTest {
     @Test
     @DisplayName("Debe validar el orden inverso usando Sequenced Collections (Java 21+)")
     void deveValidarOrdemInversa() {
-        List<Pessoa> listaInversa = ordenacao.obterListaInvertida();
+        List<Pessoa> listaInversa = ordenacao.obtenerListaInvertida();
         
         // El último elemento añadido fue Charlie (insertion order)
         // Por lo tanto, el primero en la lista inversa debe ser Charlie

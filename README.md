@@ -10,6 +10,23 @@ Este repositorio representa una auditoría y modernización profunda del framewo
 
 ---
 
+## ✅ Última Etapa: Estabilización y Refactorización (April 2026)
+
+### 1. Corrección de Inconsistencias Semánticas
+- Se resolvió el error de "Símbolo no encontrado" en `CatalogoLivros.java`. 
+- **Refactor**: Estandarización del idioma a **Portugués** (`livroList` en lugar de `libroList`), garantizando coherencia absoluta con el dominio de negocio.
+
+### 2. Infraestructura de Pruebas (JUnit 5 + Java 25)
+- **Estabilización del Motor**: Se inyectó `junit-platform-launcher` en el `testRuntimeOnly` de Gradle 9.4.1.
+- **Resultado**: Ejecución exitosa de tests concurrentes con **Virtual Threads** e **Inmutabilidad**. 
+- **Reporte Local**: [Gradle Test Report (Local)](./build/reports/tests/test/index.html).
+
+### 3. Saneamiento de Artefactos
+- Eliminación total de paquetes obsoletos (`list/`, `set/`, `map/`) en la raíz de `src/main/java`.
+- **Estructura Única**: `me.dio.collections.*` como única fuente de verdad arquitectónica.
+
+---
+
 ## 🏛️ Referencias de Autoridad (Must-Read)
 
 | Recurso | Nivel | Propósito Técnico |

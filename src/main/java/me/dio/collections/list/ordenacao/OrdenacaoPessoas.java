@@ -1,17 +1,16 @@
 package me.dio.collections.list.ordenacao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.SequencedCollection;
 import java.util.stream.Collectors;
 
 /**
  * Classe para ordenação de pessoas.
- * Implementa Sequenced Collections (Java 21+) e Streams para lógica moderna.
+ * Implementa Sequenced Collections (Java 21+) y Streams para lógica moderna.
  */
 public class OrdenacaoPessoas {
-    // SequencedCollection garante que possamos reverter ou acessar extremos de forma determinística
     private final List<Pessoa> pessoaList;
 
     public OrdenacaoPessoas() {
@@ -23,34 +22,39 @@ public class OrdenacaoPessoas {
     }
 
     /**
-     * Ordena a lista por idade usando Streams e Comparable (ordenación natural).
-     * Retorna uma lista inmutável para proteção de dados.
+     * Ordena la lista por edad usando Streams.
      */
     public List<Pessoa> ordenarPorIdade() {
         if (pessoaList.isEmpty()) throw new IllegalStateException("A lista está vazia!");
         
         return pessoaList.stream()
                 .sorted()
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toList(), 
+                        Collections::unmodifiableList
+                ));
     }
 
     /**
      * Ordena la lista por altura usando Comparator fluido.
-     * Retorna una lista inmutable.
      */
     public List<Pessoa> ordenarPorAltura() {
         if (pessoaList.isEmpty()) throw new IllegalStateException("A lista está vazia!");
 
         return pessoaList.stream()
                 .sorted(Pessoa.porAltura())
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toList(), 
+                        Collections::unmodifiableList
+                ));
     }
 
     /**
      * Exemplo de uso de Sequenced Collection para inverter a ordem.
      */
-    public List<Pessoa> obterListaInvertida() {
-        return pessoaList.reversed().stream().toList();
+    public List<Pessoa> obtenerListaInvertida() {
+        return (List<Pessoa>) ((SequencedCollection<Pessoa>) pessoaList).reversed().stream()
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public static void main(String[] args) {
@@ -61,9 +65,7 @@ public class OrdenacaoPessoas {
         ordenacaoPessoas.adicionarPessoa("Charlie", 25, 1.70);
         ordenacaoPessoas.adicionarPessoa("David", 17, 1.56);
 
-        System.out.println("Lista Original: " + ordenacaoPessoas.pessoaList);
-        System.out.println("Por Idade (Natural): " + ordenacaoPessoas.ordenarPorIdade());
-        System.out.println("Por Altura (Custom): " + ordenacaoPessoas.ordenarPorAltura());
-        System.out.println("Lista Invertida (Java 21+): " + ordenacaoPessoas.obterListaInvertida());
+        System.out.println("Por Idade: " + ordenacaoPessoas.ordenarPorIdade());
+        System.out.println("Por Altura: " + ordenacaoPessoas.ordenarPorAltura());
     }
 }

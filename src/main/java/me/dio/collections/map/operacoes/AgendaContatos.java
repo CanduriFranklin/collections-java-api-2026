@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Modernização da Agenda de Contatos usando Java 25.
- * Substitui verificaciones manuales por computeIfAbsent, merge y forEach.
+ * Modernización de la Agenda de Contatos usando Java 25.
+ * Refactor de Sincronización Javadoc vs Código: Uso de 'put' o 'merge' como método atómico.
  */
 public class AgendaContatos {
     private final Map<String, Integer> agendaContatoMap;
@@ -16,10 +16,15 @@ public class AgendaContatos {
     }
 
     /**
-     * Usa compute para adicionar ou atualizar contatos de forma atômica e elegante.
+     * Sincronización con Javadoc: Actualiza el contacto o lo añade de forma elegante.
+     * En Java 25, 'put' ya es una operación eficiente sobre Map.
      */
     public void adicionarContato(String nome, Integer telefone) {
+        // Opción 1: Put directo (sobrescribe si existe)
         agendaContatoMap.put(nome, telefone);
+        
+        // Opción 2 (Merge): Por si se desea lógica de desempate en el futuro
+        // agendaContatoMap.merge(nome, telefone, (oldValue, newValue) -> newValue);
     }
 
     public void removerContato(String nome) {
@@ -27,9 +32,6 @@ public class AgendaContatos {
         agendaContatoMap.remove(nome);
     }
 
-    /**
-     * Modernización del EntrySet usando forEach (Java 8+) para mayor claridad.
-     */
     public void exibirContatos() {
         if (agendaContatoMap.isEmpty()) {
             System.out.println("A agenda está vazia.");
@@ -39,27 +41,14 @@ public class AgendaContatos {
             System.out.printf("Nome: %s | Telefone: %d%n", nome, telefone));
     }
 
-    /**
-     * Búsqueda moderna usando Optional para evitar null-checks externos.
-     */
     public Optional<Integer> pesquisarPorNome(String nome) {
         return Optional.ofNullable(agendaContatoMap.get(nome));
     }
 
     public static void main(String[] args) {
         AgendaContatos agendaContatos = new AgendaContatos();
-
         agendaContatos.adicionarContato("Camila", 123456);
         agendaContatos.adicionarContato("João", 5665);
-        agendaContatos.adicionarContato("Carlos", 1111111);
-        agendaContatos.adicionarContato("Ana", 654987);
-
         agendaContatos.exibirContatos();
-
-        String nomePesquisa = "João";
-        agendaContatos.pesquisarPorNome(nomePesquisa).ifPresentOrElse(
-            tel -> System.out.println("Telefone de " + nomePesquisa + ": " + tel),
-            () -> System.out.println("Contato não encontrado.")
-        );
     }
 }

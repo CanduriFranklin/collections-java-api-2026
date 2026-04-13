@@ -3,8 +3,7 @@ package me.dio.collections.list.ordenacao;
 import java.util.Comparator;
 
 /**
- * Representa uma pessoa para ordenação.
- * Utiliza Record (Java 14+) e implementa Comparable para ordenação natural por idade.
+ * Record Pessoa: Inmutabilidad nativa y reducción de boilerplate.
  */
 public record Pessoa(String nome, int idade, double altura) implements Comparable<Pessoa> {
 
@@ -14,7 +13,7 @@ public record Pessoa(String nome, int idade, double altura) implements Comparabl
     }
 
     /**
-     * Factory method para um Comparator fluído por altura.
+     * Factory method para un Comparator fluído por altura.
      */
     public static Comparator<Pessoa> porAltura() {
         return Comparator.comparingDouble(Pessoa::altura);
@@ -22,10 +21,6 @@ public record Pessoa(String nome, int idade, double altura) implements Comparabl
 
     @Override
     public String toString() {
-        return "Pessoa{" +
-                "nome='" + nome + '\'' +
-                ", idade=" + idade +
-                ", altura=" + altura +
-                '}';
+        return String.format("Pessoa[nome=%s, idade=%d, altura=%.2f]", nome, idade, altura);
     }
 }

@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.*;
@@ -29,46 +31,50 @@ class CadastroProdutosTest {
     @Test
     @DisplayName("Debe validar inmutabilidad de la colección devuelta")
     void deveValidarInmutabilidad() {
-        Set<Produto> produtosPorPreco = cadastro.exibirProdutosPorPreco();
-        
+        final Set<Produto> produtosPorPreco = cadastro.exibirProdutosPorPreco();
         assertThatThrownBy(() -> produtosPorPreco.add(new Produto(5L, "Monitor", 800.0, 2)))
                 .isExactlyInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
-    @DisplayName("Debe soportar estrés de lectura concurrente con Virtual Threads (Java 25)")
-    void deveSuportarLeituraConcorrenteComVirtualThreads() throws InterruptedException {
+    @DisplayName("Debe soportar estrés de lectura concurrente con Virtual Threads y recolectar futuros")
+    void deveSuportarLeituraConcorrenteComVirtualThreads() throws Exception {
         int numeroDeHilos = 1000;
         
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            IntStream.range(0, numeroDeHilos).forEach(i -> {
-                executor.submit(() -> {
+            List<Callable<Boolean>> tareas = IntStream.range(0, numeroDeHilos)
+                .mapToObj(i -> (Callable<Boolean>) () -> {
                     Set<Produto> ordenados = cadastro.exibirProdutosPorPreco();
                     assertThat(ordenados).hasSize(4);
                     assertThat(ordenados.iterator().next().preco()).isEqualTo(30.0);
-                });
-            });
+                    return true;
+                })
+                .toList();
+
+            List<Future<Boolean>> futuros = executor.invokeAll(tareas);
+            
+            for (Future<Boolean> f : futuros) {
+                assertThat(f.get()).isTrue(); 
+            }
         }
-        // El try-with-resources cierra el executor y espera a los Virtual Threads automáticamente
     }
 
     @Test
     @DisplayName("Debe validar el orden determinista por nombre (Natural Order)")
     void deveValidarOrdenacaoNatural() {
         Set<Produto> porNome = cadastro.exibirProdutosPorNome();
-        
         assertThat(porNome)
                 .extracting(Produto::nome)
                 .containsExactly("Mouse", "Notebook", "Smartphone", "Teclado");
     }
 
     @Test
-    @DisplayName("Debe ignorar duplicados lógicos basados en el código del producto")
-    void deveIgnorarDuplicadosLogicos() {
-        cadastro.adicionarProduto(1L, "Otro Smartphone", 999.0, 1);
+    @DisplayName("Debe desempatar por código en compareTo para evitar pérdida de datos")
+    void deveDesempatarPorCodigoNoCompareTo() {
+        cadastro.adicionarProduto(10L, "Smartphone", 2000d, 1);
         
         Set<Produto> todos = cadastro.exibirProdutosPorNome();
-        assertThat(todos).hasSize(4);
-        assertThat(todos).extracting(Produto::nome).doesNotContain("Otro Smartphone");
+        assertThat(todos).hasSize(5);
+        assertThat(todos).extracting(Produto::codigo).contains(1L, 10L);
     }
 }
