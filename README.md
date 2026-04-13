@@ -10,6 +10,17 @@ Este repositorio representa una auditoría y modernización profunda del framewo
 
 ---
 
+## 🏛️ Referencias de Autoridad (Must-Read)
+
+| Recurso | Nivel | Propósito Técnico |
+| :--- | :--- | :--- |
+| **[JDK 25 API Documentation](https://docs.oracle.com/en/java/javase/25/docs/api/)** | API | Uso correcto de métodos en colecciones inmutables. |
+| **[Java Language Specification (JLS)](https://docs.oracle.com/javase/specs/)** | Especificación | Entender el compilador tras las **Sealed Classes**. |
+| **[Eclipse OpenJ9 Optimization Guide](https://www.eclipse.org/openj9/docs/)** | JVM | Ajustes de **Shared Classes** y **JIT/AOT**. |
+| **[RESOURCES.md](./RESOURCES.md)** | Full Path | **Guía Curada de Niveles de Abstracción.** |
+
+---
+
 ## 🛠️ Escalabilidad Tecnológica: De Java 8 a Java 25
 
 ### 1. Evolución de los Modelos: De Clases a Records
